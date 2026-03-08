@@ -17,7 +17,7 @@ export type AppEnv = {
 }
 
 function generateToken(password: string): string {
-  return crypto.createHash('sha256').update(password + '__nomad_session__').digest('hex').slice(0, 32)
+  return crypto.createHash('sha256').update(password + '__shareflow_session__').digest('hex').slice(0, 32)
 }
 
 export function createApp(db: IDatabase, fileStore: IFileStore, config: AppConfig) {
@@ -51,7 +51,7 @@ export function createApp(db: IDatabase, fileStore: IFileStore, config: AppConfi
     const body = await c.req.json()
     if (body.password === config.AUTH_PASSWORD) {
       const token = generateToken(config.AUTH_PASSWORD)
-      setCookie(c, 'nomad_token', token, {
+      setCookie(c, 'shareflow_token', token, {
         path: '/',
         httpOnly: true,
         sameSite: 'Lax',
@@ -67,7 +67,7 @@ export function createApp(db: IDatabase, fileStore: IFileStore, config: AppConfi
     if (!config.AUTH_PASSWORD) {
       return c.json({ authenticated: true })
     }
-    const token = getCookie(c, 'nomad_token')
+    const token = getCookie(c, 'shareflow_token')
     const expected = generateToken(config.AUTH_PASSWORD)
     return c.json({ authenticated: token === expected })
   })
@@ -88,7 +88,7 @@ export function createApp(db: IDatabase, fileStore: IFileStore, config: AppConfi
     }
 
     if (config.AUTH_PASSWORD) {
-      const token = getCookie(c, 'nomad_token')
+      const token = getCookie(c, 'shareflow_token')
       const expected = generateToken(config.AUTH_PASSWORD)
       if (token !== expected) {
         return c.json({ error: 'Unauthorized' }, 401)

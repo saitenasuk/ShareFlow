@@ -1,7 +1,7 @@
 services:
-  nomad-clipboard:
+  shareflow:
     build: .
-    container_name: nomad-clipboard
+    container_name: shareflow
     ports:
       - "3000:3000"
     volumes:

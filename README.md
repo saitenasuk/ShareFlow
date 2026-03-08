@@ -45,8 +45,8 @@ npm start
 docker compose up -d
 
 # 或手动构建
-docker build -t nomad-clipboard .
-docker run -d -p 3000:3000 -v clipboard_data:/data nomad-clipboard
+docker build -t shareflow .
+docker run -d -p 3000:3000 -v clipboard_data:/data shareflow
 ```
 
 ---
@@ -65,15 +65,15 @@ docker run -d -p 3000:3000 -v clipboard_data:/data nomad-clipboard
 npx wrangler login
 
 # 2. 创建 D1 数据库
-npx wrangler d1 create nomad-clipboard-db
+npx wrangler d1 create shareflow-db
 
 # 3. 将返回的 database_id 填入 wrangler.toml
 
 # 4. 初始化数据库
-npx wrangler d1 execute nomad-clipboard-db --file=./schema.sql
+npx wrangler d1 execute shareflow-db --file=./schema.sql
 
 # 5. 创建 R2 存储桶
-npx wrangler r2 bucket create nomad-clipboard-files
+npx wrangler r2 bucket create shareflow-files
 
 # 6. 构建前端
 npm run build
@@ -95,7 +95,7 @@ MAX_TEXT_LENGTH = "100000"       # 100k chars
 database_id = "YOUR_D1_DATABASE_ID"  # 替换为实际 ID
 
 [[r2_buckets]]
-bucket_name = "nomad-clipboard-files"
+bucket_name = "shareflow-files"
 ```
 
 ---
