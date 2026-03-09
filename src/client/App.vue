@@ -6,7 +6,7 @@
 
   <div v-else-if="showLogin" class="login-container">
     <div class="login-card glass-card">
-      <h1 class="login-title">✦ ShareFlow</h1>
+      <h1 class="login-title"><img src="/icons/logo.png" alt="ShareFlow" class="logo-img" /> ShareFlow</h1>
       <p class="login-subtitle">请输入密码以访问</p>
       <form @submit.prevent="handleLogin" class="login-form">
         <input
@@ -26,7 +26,7 @@
 
   <div v-else class="app-container">
     <header class="app-header">
-      <h1>✦ <span class="header-text">ShareFlow</span></h1>
+      <h1><img src="/icons/logo.png" alt="ShareFlow" class="logo-img" /> <span class="header-text">ShareFlow</span></h1>
       <div class="header-tabs">
         <button class="header-tab" :class="{ active: activeTab === 'clips' }" @click="activeTab = 'clips'">
           📋 <span class="header-text">剪切板</span>

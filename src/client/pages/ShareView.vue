@@ -1,7 +1,7 @@
 <template>
   <div class="share-page">
     <div class="share-page-inner">
-      <h1 class="share-page-title">✦ ShareFlow</h1>
+      <h1 class="share-page-title"><img src="/icons/logo.png" alt="ShareFlow" class="logo-img" /> ShareFlow</h1>
 
       <!-- Loading -->
       <div v-if="loading" class="share-page-card glass-card">

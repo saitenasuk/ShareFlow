@@ -49,6 +49,10 @@
   --transition-fast: 0.15s ease;
   --transition-normal: 0.25s ease;
   --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Brand title: deeper lavender, clearly purple but still readable on dark bg */
+  --color-brand-title: #b8b4ff;
+  --shadow-brand-title: 0 0 28px rgba(108, 99, 255, 0.2);
 }
 
 /* --- Reset & Base --- */
@@ -154,8 +158,20 @@ button {
 .app-header h1 {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--color-brand-title);
+  text-shadow: var(--shadow-brand-title);
   letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+/* --- Logo image (replaces ✦ symbol) --- */
+.logo-img {
+  height: 1em;
+  width: auto;
+  display: block;
+  flex-shrink: 0;
 }
 
 /* --- Two-column Layout (Desktop) --- */
@@ -257,6 +273,10 @@ button {
   }
   .header-text {
     display: none;
+  }
+  /* 品牌标题始终显示，只隐藏 Tab 按钮里的文字 */
+  .app-header h1 .header-text {
+    display: inline;
   }
 }
 
@@ -1361,9 +1381,14 @@ button {
 .login-title {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--color-brand-title);
+  text-shadow: var(--shadow-brand-title);
   margin-bottom: 8px;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3em;
 }
 .login-subtitle {
   color: var(--text-muted);
@@ -1505,9 +1530,14 @@ button {
 .share-page-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--color-brand-title);
+  text-shadow: var(--shadow-brand-title);
   text-align: center;
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3em;
 }
 .share-page-meta {
   display: flex;
