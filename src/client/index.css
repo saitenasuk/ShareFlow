@@ -1528,7 +1528,7 @@ button {
   margin-bottom: 24px;
 }
 .share-page-title {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: var(--color-brand-title);
   text-shadow: var(--shadow-brand-title);
@@ -1544,6 +1544,13 @@ button {
   gap: 12px;
   flex-wrap: wrap;
 }
+.share-above-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 10px;
+}
 .share-note-badge {
   padding: 4px 10px;
   border-radius: 20px;
@@ -1553,7 +1560,7 @@ button {
 }
 .share-meta-item {
   font-size: 0.78rem;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   padding: 4px 10px;
   border-radius: 20px;
   background: var(--bg-input);
@@ -1571,6 +1578,12 @@ button {
   margin: 16px auto 0;
 }
 
+.share-text-wrapper {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
 .share-text-display {
   font-family: var(--font-mono);
   font-size: 0.85rem;
@@ -1581,13 +1594,16 @@ button {
   max-height: 400px;
   overflow-y: auto;
   background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
   padding: 16px;
-  margin: 0 0 16px;
+  margin: 0;
 }
 .share-copy-btn {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 20px;
 }
 .share-content-file {
   text-align: center;

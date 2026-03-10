@@ -2,7 +2,6 @@
   <div class="share-page">
     <div class="share-page-inner">
       <h1 class="share-page-title"><img src="/icons/logo.png" alt="ShareFlow" class="logo-img" /> ShareFlow</h1>
-
       <!-- Loading -->
       <div v-if="loading" class="share-page-card glass-card">
         <div class="share-page-center"><span class="spinner"></span> 加载中...</div>
@@ -39,45 +38,48 @@
       </div>
 
       <!-- Content loaded -->
-      <div v-else class="share-page-card glass-card">
-        <div class="share-page-header">
-          <div class="share-page-meta">
-            <span v-if="shareInfo?.note" class="share-note-badge">📝 {{ shareInfo.note }}</span>
-            <span v-if="shareInfo?.max_views" class="share-meta-item">
-              👁️ {{ shareInfo.views + 1 }}/{{ shareInfo.max_views }} 次查看
-            </span>
-            <span v-if="shareInfo?.expires_at" class="share-meta-item">
-              ⏳ {{ formatExpiry(shareInfo.expires_at) }}
-            </span>
-          </div>
+      <template v-else>
+        <!-- Meta info above the card, right-aligned -->
+        <div class="share-above-meta">
+          <span v-if="shareInfo?.note" class="share-note-badge">📝 {{ shareInfo.note }}</span>
+          <span v-if="shareInfo?.max_views" class="share-meta-item">
+            👁️ 查看次数 {{ shareInfo.views + 1 }}/{{ shareInfo.max_views }} 
+          </span>
+          <span v-if="shareInfo?.expires_at" class="share-meta-item">
+            ⏳ {{ formatExpiry(shareInfo.expires_at) }}
+          </span>
         </div>
 
-        <!-- Text Share -->
-        <div v-if="content?.type === 'text'" class="share-content-text">
-          <pre class="share-text-display">{{ content.content }}</pre>
-          <button class="btn btn-primary share-copy-btn" @click="copyContent" style="text-align:center">
-            {{ contentCopied ? '已复制' : '复制文本' }}
-          </button>
-        </div>
-
-        <!-- File Share -->
-        <div v-else-if="content?.type === 'file'" class="share-content-file">
-          <img
-            v-if="shareInfo?.mimetype?.startsWith('image/')"
-            :src="filePreviewSrc"
-            :alt="content.filename || ''"
-            class="share-file-preview"
-          />
-          <div v-else class="share-file-icon">📄</div>
-          <div class="share-file-info">
-            <div class="share-file-name">{{ content.filename }}</div>
-            <div class="share-file-meta">{{ content.mimetype }} · {{ formatSize(content.size || 0) }}</div>
+        <div class="share-page-card glass-card">
+          <!-- Text Share -->
+          <div v-if="content?.type === 'text'" class="share-content-text">
+            <div class="share-text-wrapper">
+              <pre class="share-text-display">{{ content.content }}</pre>
+            </div>
+            <button class="btn btn-primary share-copy-btn" @click="copyContent">
+              {{ contentCopied ? '已复制' : '复制文本' }}
+            </button>
           </div>
-          <a :href="downloadLink" class="btn btn-primary share-copy-btn share-download-link" download style="text-align:center">
-            下载文件
-          </a>
+
+          <!-- File Share -->
+          <div v-else-if="content?.type === 'file'" class="share-content-file">
+            <img
+              v-if="shareInfo?.mimetype?.startsWith('image/')"
+              :src="filePreviewSrc"
+              :alt="content.filename || ''"
+              class="share-file-preview"
+            />
+            <div v-else class="share-file-icon">📄</div>
+            <div class="share-file-info">
+              <div class="share-file-name">{{ content.filename }}</div>
+              <div class="share-file-meta">{{ content.mimetype }} · {{ formatSize(content.size || 0) }}</div>
+            </div>
+            <a :href="downloadLink" class="btn btn-primary share-copy-btn share-download-link" download>
+              下载文件
+            </a>
+          </div>
         </div>
-      </div>
+      </template>
 
       <div class="share-page-footer">
         Powered by <strong>ShareFlow</strong>
