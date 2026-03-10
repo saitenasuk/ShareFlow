@@ -2,7 +2,7 @@
   <div class="clip-list">
     <div class="clip-list-header">
       <div class="clip-list-title">
-        <h2>📋 剪切板列表</h2>
+        <h2>📋 记录列表</h2>
         <span class="clip-list-count" v-if="clips.length">{{ clips.length }} 条</span>
       </div>
       <button v-if="clips.length" class="btn btn-ghost-danger btn-sm" @click="handleClearAll">
@@ -32,7 +32,7 @@
       <Transition name="confirm-fade">
         <div v-if="showClearAllConfirm" class="confirm-fullscreen" @click.self="showClearAllConfirm = false">
           <div class="confirm-dialog">
-            <p>⚠️ 确定要清空所有剪切板内容吗？</p>
+            <p>⚠️ 确定要清空所有记录吗？</p>
             <p style="font-size: 0.8rem; color: var(--text-muted)">此操作不可撤销</p>
             <div class="confirm-actions">
               <button class="btn btn-secondary btn-sm" @click="showClearAllConfirm = false">取消</button>

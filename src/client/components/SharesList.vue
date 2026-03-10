@@ -11,7 +11,7 @@
     </div>
 
     <div v-if="loading" class="clip-list-empty"><span class="spinner"></span> 加载中...</div>
-    <div v-else-if="!shares.length" class="clip-list-empty">还没有分享，点击剪切板项的 🔗 按钮创建分享</div>
+    <div v-else-if="!shares.length" class="clip-list-empty">还没有分享，点击记录的 🔗 按钮创建分享</div>
 
     <div v-else class="clip-list-items">
       <div

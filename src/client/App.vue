@@ -29,7 +29,7 @@
       <h1><img src="/icons/logo.png" alt="ShareFlow" class="logo-img" /> <span class="header-text">ShareFlow</span></h1>
       <div class="header-tabs">
         <button class="header-tab" :class="{ active: activeTab === 'clips' }" @click="activeTab = 'clips'">
-          📋 <span class="header-text">剪切板</span>
+          📋 <span class="header-text">记录</span>
         </button>
         <button class="header-tab" :class="{ active: activeTab === 'shares' }" @click="activeTab = 'shares'">
           🔗 <span class="header-text">分享</span>
@@ -266,7 +266,7 @@ async function handleLogin() {
 async function handleTextSubmit(content: string) {
   try {
     await createTextClip(content)
-    showToast('✅ 文本已发送到剪切板')
+    showToast('✅ 文本已发布')
     clipListRef.value?.loadClips()
   } catch (e: any) {
     showToast(`❌ ${e.message}`, 'error')

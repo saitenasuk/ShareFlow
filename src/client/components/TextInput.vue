@@ -17,7 +17,7 @@
           :disabled="!text.trim() || submitting"
         >
           <span v-if="submitting" class="spinner"></span>
-          {{ submitting ? '发送中...' : '发送到剪切板' }}
+          {{ submitting ? '发布中...' : '发布' }}
         </button>
         <button class="btn btn-secondary" @click="text = ''" :disabled="!text">
           清空

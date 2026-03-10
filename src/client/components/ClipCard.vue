@@ -132,7 +132,7 @@
               <div class="share-field share-field-inline" v-if="shareOpts.expiresIn">
                 <label class="share-checkbox-label">
                   <input type="checkbox" v-model="shareOpts.autoDeleteClip" class="share-checkbox" />
-                  🗑️ 过期后自动删除剪切板原项
+                  🗑️ 过期后自动删除原记录
                 </label>
               </div>
               <!-- View limit -->
