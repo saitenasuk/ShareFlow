@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS clips (
+CREATE TABLE IF NOT EXISTS items (
   id TEXT PRIMARY KEY,
   type TEXT NOT NULL CHECK(type IN ('text', 'file')),
   content TEXT,
@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS clips (
   created_at INTEGER NOT NULL DEFAULT (unixepoch())
 );
 
-CREATE INDEX IF NOT EXISTS idx_clips_created_at ON clips(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_items_created_at ON items(created_at DESC);

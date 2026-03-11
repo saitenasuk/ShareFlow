@@ -5,7 +5,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - clipboard_data:/data
+      - shareflow_data:/data
     environment:
       - MAX_FILE_SIZE=10485760
       - MAX_TEXT_LENGTH=100000
@@ -13,4 +13,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  clipboard_data:
+  shareflow_data:

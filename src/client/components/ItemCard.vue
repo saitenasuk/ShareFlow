@@ -1,16 +1,16 @@
 <template>
-  <div class="clip-card">
-    <div class="clip-card-header">
-      <div class="clip-card-meta">
-        <span class="clip-type-badge" :class="clip.type">
-          {{ clip.type === 'text' ? '📝 TEXT' : '📎 FILE' }}
+  <div class="item-card">
+    <div class="item-card-header">
+      <div class="item-card-meta">
+        <span class="item-type-badge" :class="item.type">
+          {{ item.type === 'text' ? '📝 TEXT' : '📎 FILE' }}
         </span>
-        <span class="clip-time">{{ formattedTime }}</span>
+        <span class="item-time">{{ formattedTime }}</span>
       </div>
-      <div class="clip-card-actions">
+      <div class="item-card-actions">
         <!-- Text: copy -->
         <button
-          v-if="clip.type === 'text'"
+          v-if="item.type === 'text'"
           class="btn-icon"
           @click="copyText"
           :title="copied ? '已复制!' : '复制'"
@@ -20,7 +20,7 @@
 
         <!-- File: download -->
         <a
-          v-if="clip.type === 'file'"
+          v-if="item.type === 'file'"
           :href="downloadUrl"
           class="btn-icon"
           download
@@ -31,7 +31,7 @@
         </a>
 
         <!-- Preview -->
-        <button class="btn-icon" @click="$emit('preview', clip)" title="预览">
+        <button class="btn-icon" @click="$emit('preview', item)" title="预览">
           👁️
         </button>
 
@@ -48,16 +48,16 @@
     </div>
 
     <!-- Text Content (fixed height) -->
-    <div v-if="clip.type === 'text'" class="clip-text-content">
-      <div class="clip-text-raw">{{ clip.content }}</div>
+    <div v-if="item.type === 'text'" class="item-text-content">
+      <div class="item-text-raw">{{ item.content }}</div>
     </div>
 
     <!-- File Content -->
-    <div v-else class="clip-file-content">
+    <div v-else class="item-file-content">
       <img
         v-if="isImage"
         :src="previewUrl"
-        :alt="clip.filename || 'file'"
+        :alt="item.filename || 'file'"
         class="file-thumb"
         loading="lazy"
       />
@@ -65,15 +65,15 @@
         {{ fileIcon }}
       </div>
       <div class="file-info">
-        <div class="file-name">{{ clip.filename }}</div>
-        <div class="file-meta">{{ formattedSize }} · {{ clip.mimetype }}</div>
+        <div class="file-name">{{ item.filename }}</div>
+        <div class="file-meta">{{ formattedSize }} · {{ item.mimetype }}</div>
       </div>
     </div>
 
     <!-- Mobile action bar -->
-    <div class="clip-card-actions-mobile">
+    <div class="item-card-actions-mobile">
       <a
-        v-if="clip.type === 'file'"
+        v-if="item.type === 'file'"
         :href="downloadUrl"
         class="btn-mobile-action primary"
         download
@@ -84,7 +84,7 @@
         class="btn-mobile-action primary"
         @click="copyText"
       >{{ copied ? '✅ 已复制' : '📋 复制' }}</button>
-      <button class="btn-mobile-action" @click="$emit('preview', clip)">👁️ 查看</button>
+      <button class="btn-mobile-action" @click="$emit('preview', item)">👁️ 查看</button>
       <button class="btn-mobile-action" @click="openShareDialog">🔗 分享</button>
       <button class="btn-mobile-action danger" @click="confirmDelete">🗑️</button>
     </div>
@@ -128,10 +128,10 @@
                   </div>
                 </div>
               </div>
-              <!-- Auto delete clip -->
+              <!-- Auto delete item -->
               <div class="share-field share-field-inline" v-if="shareOpts.expiresIn">
                 <label class="share-checkbox-label">
-                  <input type="checkbox" v-model="shareOpts.autoDeleteClip" class="share-checkbox" />
+                  <input type="checkbox" v-model="shareOpts.autoDeleteItem" class="share-checkbox" />
                   🗑️ 过期后自动删除原记录
                 </label>
               </div>
@@ -182,16 +182,16 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive } from 'vue'
-import type { Clip } from '../composables/useApi'
+import type { Item } from '../composables/useApi'
 import { useApi } from '../composables/useApi'
 
 const props = defineProps<{
-  clip: Clip
+  item: Item
 }>()
 
 const emit = defineEmits<{
   delete: [id: string, type: 'text' | 'file']
-  preview: [clip: Clip]
+  preview: [item: Item]
   toast: [message: string, type: 'success' | 'error']
   shared: []
 }>()
@@ -208,7 +208,7 @@ const shareOpts = reactive({
   maxViews: null as number | null,
   password: '',
   note: '',
-  autoDeleteClip: false,
+  autoDeleteItem: false,
 })
 
 const expiryOptions = [
@@ -227,14 +227,14 @@ const expiryLabel = computed(() => {
 })
 
 const isImage = computed(() =>
-  props.clip.mimetype?.startsWith('image/')
+  props.item.mimetype?.startsWith('image/')
 )
 
-const previewUrl = computed(() => getPreviewUrl(props.clip.id))
-const downloadUrl = computed(() => getFileUrl(props.clip.id))
+const previewUrl = computed(() => getPreviewUrl(props.item.id))
+const downloadUrl = computed(() => getFileUrl(props.item.id))
 
 const fileIcon = computed(() => {
-  const mime = props.clip.mimetype || ''
+  const mime = props.item.mimetype || ''
   if (mime.startsWith('video/')) return '🎬'
   if (mime.startsWith('audio/')) return '🎵'
   if (mime.includes('pdf')) return '📄'
@@ -245,13 +245,13 @@ const fileIcon = computed(() => {
 })
 
 const formattedTime = computed(() => {
-  const date = new Date(props.clip.created_at * 1000)
+  const date = new Date(props.item.created_at * 1000)
   const pad = (n: number) => String(n).padStart(2, '0')
   return `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
 })
 
 const formattedSize = computed(() => {
-  const size = props.clip.size || 0
+  const size = props.item.size || 0
   if (size < 1024) return `${size} B`
   if (size < 1048576) return `${(size / 1024).toFixed(1)} KB`
   return `${(size / 1048576).toFixed(1)} MB`
@@ -263,7 +263,7 @@ function confirmDelete() {
 
 function doDelete() {
   showDeleteConfirm.value = false
-  emit('delete', props.clip.id, props.clip.type)
+  emit('delete', props.item.id, props.item.type)
 }
 
 function openShareDialog() {
@@ -271,7 +271,7 @@ function openShareDialog() {
   shareOpts.maxViews = null
   shareOpts.password = ''
   shareOpts.note = ''
-  shareOpts.autoDeleteClip = false
+  shareOpts.autoDeleteItem = false
   showExpiryMenu.value = false
   showShareDialog.value = true
 }
@@ -280,12 +280,12 @@ async function doShare() {
   shareLoading.value = true
   try {
     const result = await createShare({
-      clip_id: props.clip.id,
+      item_id: props.item.id,
       password: shareOpts.password || undefined,
       max_views: shareOpts.maxViews || undefined,
       expires_in: shareOpts.expiresIn ? parseInt(shareOpts.expiresIn) : undefined,
       note: shareOpts.note || undefined,
-      auto_delete_clip: shareOpts.autoDeleteClip,
+      auto_delete_item: shareOpts.autoDeleteItem,
     })
 
     // Copy share URL
@@ -313,14 +313,14 @@ async function doShare() {
 }
 
 async function copyText() {
-  if (!props.clip.content) return
+  if (!props.item.content) return
   try {
-    await navigator.clipboard.writeText(props.clip.content)
+    await navigator.clipboard.writeText(props.item.content)
     copied.value = true
     setTimeout(() => (copied.value = false), 2000)
   } catch {
     const textarea = document.createElement('textarea')
-    textarea.value = props.clip.content
+    textarea.value = props.item.content
     textarea.style.cssText = 'position:fixed;opacity:0'
     document.body.appendChild(textarea)
     textarea.select()

@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { getCookie, setCookie } from 'hono/cookie'
-import { clips } from './routes/clips.js'
+import { items } from './routes/items.js'
 import { files } from './routes/files.js'
 import { shares } from './routes/shares.js'
 import type { IDatabase, IFileStore } from './storage/interface.js'
@@ -97,20 +97,20 @@ export function createApp(db: IDatabase, fileStore: IFileStore, config: AppConfi
     await next()
   })
 
-  // Clear all clips
-  app.delete('/api/clips/all', async (c) => {
+  // Clear all items
+  app.delete('/api/items/all', async (c) => {
     const deleted = await db.deleteAll()
-    // Clean up file store for file clips
-    for (const clip of deleted) {
-      if (clip.type === 'file' && clip.content) {
-        try { await fileStore.delete(clip.content) } catch {}
+    // Clean up file store for file items
+    for (const item of deleted) {
+      if (item.type === 'file' && item.content) {
+        try { await fileStore.delete(item.content) } catch {}
       }
     }
     return c.json({ deleted: deleted.length })
   })
 
   // Mount routes
-  app.route('/api/clips', clips)
+  app.route('/api/items', items)
   app.route('/api/files', files)
   app.route('/api/shares', shares)
 

@@ -3,27 +3,27 @@ import { nanoid } from 'nanoid'
 import type { IDatabase } from '../storage/interface.js'
 import type { AppConfig } from '../config.js'
 
-export type ClipsEnv = {
+export type ItemsEnv = {
   Variables: {
     db: IDatabase
     config: AppConfig
   }
 }
 
-const clips = new Hono<ClipsEnv>()
+const items = new Hono<ItemsEnv>()
 
-// List clips
-clips.get('/', async (c) => {
+// List items
+items.get('/', async (c) => {
   const db = c.get('db')
   const limit = Math.min(parseInt(c.req.query('limit') || '50'), 100)
   const offset = parseInt(c.req.query('offset') || '0')
-  const items = await db.listClips(limit, offset)
-  const total = await db.countClips()
-  return c.json({ items, total, limit, offset })
+  const rows = await db.listItems(limit, offset)
+  const total = await db.countItems()
+  return c.json({ items: rows, total, limit, offset })
 })
 
-// Create text clip
-clips.post('/', async (c) => {
+// Create text item
+items.post('/', async (c) => {
   const db = c.get('db')
   const config = c.get('config')
   const body = await c.req.json()
@@ -37,7 +37,7 @@ clips.post('/', async (c) => {
     return c.json({ error: `Content exceeds maximum length of ${config.MAX_TEXT_LENGTH} characters` }, 400)
   }
 
-  const clip = {
+  const item = {
     id: nanoid(12),
     type: 'text' as const,
     content,
@@ -47,33 +47,33 @@ clips.post('/', async (c) => {
     created_at: Math.floor(Date.now() / 1000),
   }
 
-  await db.createClip(clip)
-  return c.json(clip, 201)
+  await db.createItem(item)
+  return c.json(item, 201)
 })
 
-// Get single clip
-clips.get('/:id', async (c) => {
+// Get single item
+items.get('/:id', async (c) => {
   const db = c.get('db')
-  const clip = await db.getClip(c.req.param('id'))
-  if (!clip) return c.json({ error: 'Not found' }, 404)
-  return c.json(clip)
+  const item = await db.getItem(c.req.param('id'))
+  if (!item) return c.json({ error: 'Not found' }, 404)
+  return c.json(item)
 })
 
 // Get raw text content
-clips.get('/:id/raw', async (c) => {
+items.get('/:id/raw', async (c) => {
   const db = c.get('db')
-  const clip = await db.getClip(c.req.param('id'))
-  if (!clip) return c.json({ error: 'Not found' }, 404)
-  if (clip.type !== 'text') return c.json({ error: 'Not a text clip' }, 400)
-  return c.text(clip.content || '')
+  const item = await db.getItem(c.req.param('id'))
+  if (!item) return c.json({ error: 'Not found' }, 404)
+  if (item.type !== 'text') return c.json({ error: 'Not a text item' }, 400)
+  return c.text(item.content || '')
 })
 
-// Delete clip
-clips.delete('/:id', async (c) => {
+// Delete item
+items.delete('/:id', async (c) => {
   const db = c.get('db')
-  const deleted = await db.deleteClip(c.req.param('id'))
+  const deleted = await db.deleteItem(c.req.param('id'))
   if (!deleted) return c.json({ error: 'Not found' }, 404)
   return c.json({ success: true })
 })
 
-export { clips }
+export { items }

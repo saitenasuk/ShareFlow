@@ -1,32 +1,32 @@
 <template>
-  <div class="clip-list">
-    <div class="clip-list-header">
-      <div class="clip-list-title">
+  <div class="item-list">
+    <div class="item-list-header">
+      <div class="item-list-title">
         <h2>🔗 分享列表</h2>
-        <span class="clip-list-count" v-if="shares.length">{{ shares.length }} 条</span>
+        <span class="item-list-count" v-if="shares.length">{{ shares.length }} 条</span>
       </div>
       <button v-if="shares.length" class="btn btn-ghost-danger btn-sm" @click="handleClearAll">
         清空列表
       </button>
     </div>
 
-    <div v-if="loading" class="clip-list-empty"><span class="spinner"></span> 加载中...</div>
-    <div v-else-if="!shares.length" class="clip-list-empty">还没有分享，点击记录的 🔗 按钮创建分享</div>
+    <div v-if="loading" class="item-list-empty"><span class="spinner"></span> 加载中...</div>
+    <div v-else-if="!shares.length" class="item-list-empty">还没有分享，点击记录的 🔗 按钮创建分享</div>
 
-    <div v-else class="clip-list-items">
+    <div v-else class="item-list-items">
       <div
         v-for="s in shares"
         :key="s.id"
-        class="clip-card share-list-card"
+        class="item-card share-list-card"
       >
-        <div class="clip-card-header">
-          <div class="clip-card-meta">
-            <span class="clip-type-badge" :class="s.clip_type || 'text'">
-              {{ s.clip_type === 'file' ? '📎 FILE' : '📝 TEXT' }}
+        <div class="item-card-header">
+          <div class="item-card-meta">
+            <span class="item-type-badge" :class="s.item_type || 'text'">
+              {{ s.item_type === 'file' ? '📎 FILE' : '📝 TEXT' }}
             </span>
-            <span class="clip-time">{{ formattedTime(s.created_at) }}</span>
+            <span class="item-time">{{ formattedTime(s.created_at) }}</span>
           </div>
-          <div class="clip-card-actions">
+          <div class="item-card-actions">
             <button class="btn-icon" @click="copyShareLink(s)" :title="copiedId === s.id ? '已复制!' : '复制链接'">
               {{ copiedId === s.id ? '✅' : '📋' }}
             </button>
@@ -35,19 +35,19 @@
         </div>
 
         <div>
-          <div v-if="s.clip_type === 'file'" class="share-list-filename">📎 {{ s.clip_filename }}</div>
-          <div v-else-if="s.clip_preview" class="share-list-filename">📝 {{ s.clip_preview }}{{ s.clip_preview && s.clip_preview.length >= 50 ? '...' : '' }}</div>
+          <div v-if="s.item_type === 'file'" class="share-list-filename">📎 {{ s.item_filename }}</div>
+          <div v-else-if="s.item_preview" class="share-list-filename">📝 {{ s.item_preview }}{{ s.item_preview && s.item_preview.length >= 50 ? '...' : '' }}</div>
           <div class="share-list-meta">
             <span v-if="s.password">🔒 有密码</span>
             <span v-if="s.max_views !== null">👁️ {{ s.views }}/{{ s.max_views }}</span>
             <span v-if="s.expires_at">⏳ {{ formatExpiry(s.expires_at) }}</span>
-            <span v-if="s.auto_delete_clip">🗑️ 到期删源</span>
+            <span v-if="s.auto_delete_item">🗑️ 到期删源</span>
             <span v-if="s.note" class="share-list-note">📝 {{ s.note }}</span>
           </div>
         </div>
 
         <!-- Mobile action bar -->
-        <div class="clip-card-actions-mobile">
+        <div class="item-card-actions-mobile">
           <button class="btn-mobile-action primary" @click="copyShareLink(s)">
             {{ copiedId === s.id ? '✅ 已复制' : '📋 复制链接' }}
           </button>

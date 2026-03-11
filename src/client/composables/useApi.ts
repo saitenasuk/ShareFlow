@@ -1,6 +1,6 @@
 import { ref, type Ref } from 'vue'
 
-export interface Clip {
+export interface Item {
   id: string
   type: 'text' | 'file'
   content: string | null
@@ -47,18 +47,18 @@ export interface ShareContent {
 
 export interface ShareListItem {
   id: string
-  clip_id: string
+  item_id: string
   has_password: boolean
   password: string | null
   max_views: number | null
   views: number
   expires_at: number | null
   note: string | null
-  auto_delete_clip: number
+  auto_delete_item: number
   created_at: number
-  clip_type?: string
-  clip_filename?: string
-  clip_preview?: string
+  item_type?: string
+  item_filename?: string
+  item_preview?: string
 }
 
 const API_BASE = '/api'
@@ -89,12 +89,12 @@ export function useApi() {
     return data.authenticated === true
   }
 
-  async function fetchClips(limit = 50, offset = 0) {
+  async function fetchItems(limit = 50, offset = 0) {
     loading.value = true
     error.value = null
     try {
-      const res = await fetch(`${API_BASE}/clips?limit=${limit}&offset=${offset}`)
-      if (!res.ok) throw new Error('Failed to fetch clips')
+      const res = await fetch(`${API_BASE}/items?limit=${limit}&offset=${offset}`)
+      if (!res.ok) throw new Error('Failed to fetch items')
       return await res.json()
     } catch (e: any) {
       error.value = e.message
@@ -104,18 +104,18 @@ export function useApi() {
     }
   }
 
-  async function createTextClip(content: string): Promise<Clip> {
+  async function createTextItem(content: string): Promise<Item> {
     loading.value = true
     error.value = null
     try {
-      const res = await fetch(`${API_BASE}/clips`, {
+      const res = await fetch(`${API_BASE}/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content }),
       })
       if (!res.ok) {
         const data = await res.json()
-        throw new Error(data.error || 'Failed to create clip')
+        throw new Error(data.error || 'Failed to create item')
       }
       return await res.json()
     } catch (e: any) {
@@ -129,7 +129,7 @@ export function useApi() {
   function uploadFile(
     file: File,
     onProgress?: (progress: UploadProgress) => void
-  ): Promise<Clip> {
+  ): Promise<Item> {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest()
       const formData = new FormData()
@@ -166,14 +166,14 @@ export function useApi() {
     })
   }
 
-  async function deleteClip(id: string, type: 'text' | 'file'): Promise<void> {
-    const endpoint = type === 'file' ? `${API_BASE}/files/${id}` : `${API_BASE}/clips/${id}`
+  async function deleteItem(id: string, type: 'text' | 'file'): Promise<void> {
+    const endpoint = type === 'file' ? `${API_BASE}/files/${id}` : `${API_BASE}/items/${id}`
     const res = await fetch(endpoint, { method: 'DELETE' })
     if (!res.ok) throw new Error('Failed to delete')
   }
 
   async function clearAll(): Promise<number> {
-    const res = await fetch(`${API_BASE}/clips/all`, { method: 'DELETE' })
+    const res = await fetch(`${API_BASE}/items/all`, { method: 'DELETE' })
     if (!res.ok) throw new Error('Failed to clear all')
     const data = await res.json()
     return data.deleted
@@ -181,12 +181,12 @@ export function useApi() {
 
   // --- Share API ---
   async function createShare(opts: {
-    clip_id: string
+    item_id: string
     password?: string
     max_views?: number
     expires_in?: number
     note?: string
-    auto_delete_clip?: boolean
+    auto_delete_item?: boolean
   }): Promise<{ id: string; url: string }> {
     const res = await fetch(`${API_BASE}/shares`, {
       method: 'POST',
@@ -267,10 +267,10 @@ export function useApi() {
     fetchConfig,
     login,
     checkAuth,
-    fetchClips,
-    createTextClip,
+    fetchItems,
+    createTextItem,
     uploadFile,
-    deleteClip,
+    deleteItem,
     clearAll,
     createShare,
     listShares,

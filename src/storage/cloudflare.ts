@@ -1,4 +1,4 @@
-import type { ClipRecord, ShareRecord, IDatabase, IFileStore } from './interface.js'
+import type { ItemRecord, ShareRecord, IDatabase, IFileStore } from './interface.js'
 
 // Cloudflare D1 Database Adapter
 export class D1Database implements IDatabase {
@@ -6,7 +6,7 @@ export class D1Database implements IDatabase {
 
   async initialize(): Promise<void> {
     await (this.db as any).exec(`
-      CREATE TABLE IF NOT EXISTS clips (
+      CREATE TABLE IF NOT EXISTS items (
         id TEXT PRIMARY KEY,
         type TEXT NOT NULL CHECK(type IN ('text', 'file')),
         content TEXT,
@@ -19,68 +19,68 @@ export class D1Database implements IDatabase {
     await (this.db as any).exec(`
       CREATE TABLE IF NOT EXISTS shares (
         id TEXT PRIMARY KEY,
-        clip_id TEXT NOT NULL,
+        item_id TEXT NOT NULL,
         password TEXT,
         max_views INTEGER,
         views INTEGER NOT NULL DEFAULT 0,
         expires_at INTEGER,
         note TEXT,
-        auto_delete_clip INTEGER NOT NULL DEFAULT 0,
+        auto_delete_item INTEGER NOT NULL DEFAULT 0,
         created_at INTEGER NOT NULL,
-        FOREIGN KEY (clip_id) REFERENCES clips(id) ON DELETE CASCADE
+        FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
       )
     `)
   }
 
-  async listClips(limit: number, offset: number): Promise<ClipRecord[]> {
+  async listItems(limit: number, offset: number): Promise<ItemRecord[]> {
     const result = await (this.db as any)
-      .prepare('SELECT * FROM clips ORDER BY created_at DESC LIMIT ? OFFSET ?')
+      .prepare('SELECT * FROM items ORDER BY created_at DESC LIMIT ? OFFSET ?')
       .bind(limit, offset)
       .all()
-    return result.results as ClipRecord[]
+    return result.results as ItemRecord[]
   }
 
-  async getClip(id: string): Promise<ClipRecord | null> {
+  async getItem(id: string): Promise<ItemRecord | null> {
     const result = await (this.db as any)
-      .prepare('SELECT * FROM clips WHERE id = ?')
+      .prepare('SELECT * FROM items WHERE id = ?')
       .bind(id)
       .first()
-    return result as ClipRecord | null
+    return result as ItemRecord | null
   }
 
-  async createClip(clip: ClipRecord): Promise<void> {
+  async createItem(item: ItemRecord): Promise<void> {
     await (this.db as any)
       .prepare(
-        'INSERT INTO clips (id, type, content, filename, mimetype, size, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO items (id, type, content, filename, mimetype, size, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
       )
-      .bind(clip.id, clip.type, clip.content, clip.filename, clip.mimetype, clip.size, clip.created_at)
+      .bind(item.id, item.type, item.content, item.filename, item.mimetype, item.size, item.created_at)
       .run()
   }
 
-  async deleteClip(id: string): Promise<boolean> {
-    await (this.db as any).prepare('DELETE FROM shares WHERE clip_id = ?').bind(id).run()
+  async deleteItem(id: string): Promise<boolean> {
+    await (this.db as any).prepare('DELETE FROM shares WHERE item_id = ?').bind(id).run()
     const result = await (this.db as any)
-      .prepare('DELETE FROM clips WHERE id = ?')
+      .prepare('DELETE FROM items WHERE id = ?')
       .bind(id)
       .run()
     return result.meta.changes > 0
   }
 
-  async countClips(): Promise<number> {
+  async countItems(): Promise<number> {
     const result = await (this.db as any)
-      .prepare('SELECT COUNT(*) as count FROM clips')
+      .prepare('SELECT COUNT(*) as count FROM items')
       .first()
     return (result as any).count
   }
 
-  async deleteAll(): Promise<ClipRecord[]> {
+  async deleteAll(): Promise<ItemRecord[]> {
     const result = await (this.db as any)
-      .prepare('SELECT * FROM clips')
+      .prepare('SELECT * FROM items')
       .all()
-    const all = result.results as ClipRecord[]
+    const all = result.results as ItemRecord[]
     if (all.length > 0) {
       await (this.db as any).prepare('DELETE FROM shares').run()
-      await (this.db as any).prepare('DELETE FROM clips').run()
+      await (this.db as any).prepare('DELETE FROM items').run()
     }
     return all
   }
@@ -88,8 +88,8 @@ export class D1Database implements IDatabase {
   // --- Shares ---
   async createShare(share: ShareRecord): Promise<void> {
     await (this.db as any)
-      .prepare('INSERT INTO shares (id, clip_id, password, max_views, views, expires_at, note, auto_delete_clip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-      .bind(share.id, share.clip_id, share.password, share.max_views, share.views, share.expires_at, share.note, share.auto_delete_clip, share.created_at)
+      .prepare('INSERT INTO shares (id, item_id, password, max_views, views, expires_at, note, auto_delete_item, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(share.id, share.item_id, share.password, share.max_views, share.views, share.expires_at, share.note, share.auto_delete_item, share.created_at)
       .run()
   }
 
@@ -98,10 +98,10 @@ export class D1Database implements IDatabase {
     return result as ShareRecord | null
   }
 
-  async listShares(): Promise<(ShareRecord & { clip_type?: string; clip_filename?: string; clip_preview?: string })[]> {
+  async listShares(): Promise<(ShareRecord & { item_type?: string; item_filename?: string; item_preview?: string })[]> {
     const now = Math.floor(Date.now() / 1000)
     const result = await (this.db as any)
-      .prepare('SELECT s.*, c.type as clip_type, c.filename as clip_filename, SUBSTR(c.content, 1, 50) as clip_preview FROM shares s LEFT JOIN clips c ON s.clip_id = c.id WHERE (s.expires_at IS NULL OR s.expires_at > ?) ORDER BY s.created_at DESC')
+      .prepare('SELECT s.*, c.type as item_type, c.filename as item_filename, SUBSTR(c.content, 1, 50) as item_preview FROM shares s LEFT JOIN items c ON s.item_id = c.id WHERE (s.expires_at IS NULL OR s.expires_at > ?) ORDER BY s.created_at DESC')
       .bind(now).all()
     return result.results as any[]
   }
@@ -122,15 +122,15 @@ export class D1Database implements IDatabase {
 
   async deleteExpiredShares(): Promise<number> {
     const now = Math.floor(Date.now() / 1000)
-    // Get clips to auto-delete (expired or max_views exceeded)
+    // Get items to auto-delete (expired or max_views exceeded)
     const autoDeleteResult = await (this.db as any)
-      .prepare('SELECT clip_id FROM shares WHERE auto_delete_clip = 1 AND ((expires_at IS NOT NULL AND expires_at < ?) OR (max_views IS NOT NULL AND views >= max_views))')
+      .prepare('SELECT item_id FROM shares WHERE auto_delete_item = 1 AND ((expires_at IS NOT NULL AND expires_at < ?) OR (max_views IS NOT NULL AND views >= max_views))')
       .bind(now).all()
     const result = await (this.db as any)
       .prepare('DELETE FROM shares WHERE (expires_at IS NOT NULL AND expires_at < ?) OR (max_views IS NOT NULL AND views >= max_views)')
       .bind(now).run()
     for (const row of autoDeleteResult.results) {
-      await (this.db as any).prepare('DELETE FROM clips WHERE id = ?').bind(row.clip_id).run()
+      await (this.db as any).prepare('DELETE FROM items WHERE id = ?').bind(row.item_id).run()
     }
     return result.meta.changes
   }

@@ -1,5 +1,5 @@
 /* =============================================
-   ShareFlow — Design System
+   ShareFlow ? Design System
    Dark theme with glassmorphism
    ============================================= */
 
@@ -166,7 +166,7 @@ button {
   gap: 0.3em;
 }
 
-/* --- Logo image (replaces ✦ symbol) --- */
+/* --- Logo image (replaces ? symbol) --- */
 .logo-img {
   height: 1em;
   width: auto;
@@ -200,7 +200,7 @@ button {
   min-height: 0;
 }
 
-/* Shared section title style — must match .clip-list-header height */
+/* Shared section title style - must match .item-list-header height */
 .section-title {
   font-size: 0.95rem;
   font-weight: 600;
@@ -268,13 +268,12 @@ button {
     overflow: hidden;
     min-height: 0;
   }
-  .clip-list-items {
+  .item-list-items {
     overscroll-behavior: contain;
   }
   .header-text {
     display: none;
   }
-  /* 品牌标题始终显示，只隐藏 Tab 按钮里的文字 */
   .app-header h1 .header-text {
     display: inline;
   }
@@ -349,7 +348,7 @@ button {
   color: var(--error);
 }
 
-/* --- Markdown Preview (only in clip cards) --- */
+/* --- Markdown Preview (only in item cards) --- */
 .markdown-preview {
   font-size: 0.85rem;
   line-height: 1.7;
@@ -734,8 +733,8 @@ button {
   white-space: nowrap;
 }
 
-/* --- Clip List --- */
-.clip-list {
+/* --- Item List --- */
+.item-list {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -744,7 +743,7 @@ button {
   height: 100%;
 }
 
-.clip-list-header {
+.item-list-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -752,23 +751,23 @@ button {
   height: 32px;
   padding: 0 6px 0 0;
 }
-.clip-list-header h2 {
+.item-list-header h2 {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-primary);
 }
-.clip-list-title {
+.item-list-title {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.clip-list-header-actions {
+.item-list-header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.clip-list-count {
+.item-list-count {
   font-size: 0.72rem;
   color: var(--text-secondary);
   background: var(--bg-input);
@@ -778,7 +777,7 @@ button {
 }
 
 /* List layout */
-.clip-list-items {
+.item-list-items {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -832,8 +831,8 @@ button {
   color: var(--error);
 }
 
-/* --- Clip Card --- */
-.clip-card {
+/* --- Item Card --- */
+.item-card {
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -846,22 +845,22 @@ button {
   overflow: hidden;
   flex-shrink: 0;
 }
-.clip-card:hover {
+.item-card:hover {
   background: var(--bg-card-hover);
   border-color: rgba(255, 255, 255, 0.14);
   box-shadow: var(--shadow-sm);
 }
 
 /* Expired card */
-.clip-card.expired {
+.item-card.expired {
   opacity: 0.5;
   border-color: rgba(248, 113, 113, 0.15);
 }
-.clip-card.expired:hover {
+.item-card.expired:hover {
   opacity: 0.7;
 }
 
-.clip-expired-badge {
+.item-expired-badge {
   padding: 1px 7px;
   border-radius: 10px;
   font-size: 0.62rem;
@@ -882,20 +881,20 @@ button {
   }
 }
 
-.clip-card-header {
+.item-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
 }
-.clip-card-meta {
+.item-card-meta {
   display: flex;
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
 }
 
-.clip-type-badge {
+.item-type-badge {
   padding: 2px 8px;
   border-radius: 20px;
   font-size: 0.65rem;
@@ -903,27 +902,27 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.clip-type-badge.text {
+.item-type-badge.text {
   background: var(--accent-soft);
   color: var(--accent);
 }
-.clip-type-badge.file {
+.item-type-badge.file {
   background: var(--success-bg);
   color: var(--success);
 }
 
-.clip-time {
+.item-time {
   font-size: 0.7rem;
   color: var(--text-muted);
 }
-.clip-card-actions {
+.item-card-actions {
   display: flex;
   gap: 4px;
   flex-shrink: 0;
 }
 
-/* Text content — fixed height, no scroll */
-.clip-text-content {
+/* Text content ? fixed height, no scroll */
+.item-text-content {
   font-size: 0.85rem;
   line-height: 1.6;
   max-height: 80px;
@@ -932,7 +931,7 @@ button {
   -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
   mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
 }
-.clip-text-raw {
+.item-text-raw {
   white-space: pre-wrap;
   font-family: var(--font-mono);
   font-size: 0.82rem;
@@ -940,7 +939,7 @@ button {
 }
 
 /* File content */
-.clip-file-content {
+.item-file-content {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1220,25 +1219,25 @@ button {
 }
 
 /* Hide mobile actions on desktop (default) */
-.clip-card-actions-mobile {
+.item-card-actions-mobile {
   display: none;
 }
 
 /* --- Small screen overrides --- */
 @media (max-width: 768px) {
-  /* Card becomes vertical layout: header → content → actions */
-  .clip-card {
+  /* Card becomes vertical layout: header ? content ? actions */
+  .item-card {
     display: flex;
     flex-direction: column;
   }
 
   /* Hide actions from header on mobile */
-  .clip-card-header .clip-card-actions {
+  .item-card-header .item-card-actions {
     display: none;
   }
 
   /* File content stays horizontal */
-  .clip-file-content {
+  .item-file-content {
     flex-direction: row;
     align-items: center;
   }
@@ -1249,14 +1248,14 @@ button {
   }
 
   /* Mobile action bar at bottom */
-  .clip-card-actions-mobile {
+  .item-card-actions-mobile {
     display: flex;
     gap: 6px;
     padding-top: 10px;
     border-top: 1px solid var(--border);
     margin-top: 10px;
   }
-  .clip-card-actions-mobile .btn-mobile-action {
+  .item-card-actions-mobile .btn-mobile-action {
     flex: 1;
     display: flex;
     align-items: center;
@@ -1274,19 +1273,19 @@ button {
     text-decoration: none;
     -webkit-tap-highlight-color: transparent;
   }
-  .clip-card-actions-mobile .btn-mobile-action:hover {
+  .item-card-actions-mobile .btn-mobile-action:hover {
     background: rgba(255, 255, 255, 0.08);
     color: var(--text-primary);
   }
-  .clip-card-actions-mobile .btn-mobile-action.primary {
+  .item-card-actions-mobile .btn-mobile-action.primary {
     background: var(--accent-soft);
     color: var(--accent);
   }
-  .clip-card-actions-mobile .btn-mobile-action.danger {
+  .item-card-actions-mobile .btn-mobile-action.danger {
     flex: 0 0 auto;
     width: 40px;
   }
-  .clip-card-actions-mobile .btn-mobile-action.danger:hover {
+  .item-card-actions-mobile .btn-mobile-action.danger:hover {
     background: rgba(239, 68, 68, 0.15);
     color: var(--error);
   }

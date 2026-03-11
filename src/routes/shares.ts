@@ -16,31 +16,31 @@ const shares = new Hono<SharesEnv>()
 // List all shares (auth required - handled by middleware)
 shares.get('/', async (c) => {
   const db = c.get('db')
-  const items = await db.listShares()
-  return c.json({ items })
+  const result = await db.listShares()
+  return c.json({ items: result })
 })
 
 // Create a share
 shares.post('/', async (c) => {
   const db = c.get('db')
   const body = await c.req.json()
-  const { clip_id, password, max_views, expires_in, note, auto_delete_clip } = body
+  const { item_id, password, max_views, expires_in, note, auto_delete_item } = body
 
-  if (!clip_id) return c.json({ error: 'clip_id is required' }, 400)
+  if (!item_id) return c.json({ error: 'item_id is required' }, 400)
 
-  const clip = await db.getClip(clip_id)
-  if (!clip) return c.json({ error: 'Clip not found' }, 404)
+  const item = await db.getItem(item_id)
+  if (!item) return c.json({ error: 'Item not found' }, 404)
 
   const now = Math.floor(Date.now() / 1000)
   const share = {
     id: nanoid(10),
-    clip_id,
+    item_id,
     password: password || null,
     max_views: max_views ? parseInt(max_views, 10) : null,
     views: 0,
     expires_at: expires_in ? now + parseInt(expires_in, 10) : null,
     note: note || null,
-    auto_delete_clip: auto_delete_clip ? 1 : 0,
+    auto_delete_item: auto_delete_item ? 1 : 0,
     created_at: now,
   }
 
@@ -70,23 +70,23 @@ shares.get('/:id', async (c) => {
     return c.json({ error: 'Share view limit reached' }, 410)
   }
 
-  const clip = await db.getClip(share.clip_id)
-  if (!clip) {
+  const item = await db.getItem(share.item_id)
+  if (!item) {
     await db.deleteShare(share.id)
     return c.json({ error: 'Shared content no longer exists' }, 404)
   }
 
   return c.json({
     id: share.id,
-    type: clip.type,
+    type: item.type,
     has_password: !!share.password,
     max_views: share.max_views,
     views: share.views,
     expires_at: share.expires_at,
     note: share.note,
-    filename: clip.filename,
-    mimetype: clip.mimetype,
-    size: clip.size,
+    filename: item.filename,
+    mimetype: item.mimetype,
+    size: item.size,
     created_at: share.created_at,
   })
 })
@@ -128,8 +128,8 @@ shares.get('/:id/content', async (c) => {
     return c.json({ error: 'Password required' }, 403)
   }
 
-  const clip = await db.getClip(share.clip_id)
-  if (!clip) {
+  const item = await db.getItem(share.item_id)
+  if (!item) {
     await db.deleteShare(share.id)
     return c.json({ error: 'Shared content no longer exists' }, 404)
   }
@@ -137,20 +137,20 @@ shares.get('/:id/content', async (c) => {
   // Increment views
   await db.incrementShareViews(share.id)
 
-  if (clip.type === 'text') {
+  if (item.type === 'text') {
     return c.json({
       type: 'text',
-      content: clip.content,
+      content: item.content,
       note: share.note,
     })
   }
 
-  // For files, return file metadata (actual download via /content/download)
+  // For files, return file metadata (actual download via /download)
   return c.json({
     type: 'file',
-    filename: clip.filename,
-    mimetype: clip.mimetype,
-    size: clip.size,
+    filename: item.filename,
+    mimetype: item.mimetype,
+    size: item.size,
     note: share.note,
   })
 })
@@ -179,17 +179,17 @@ shares.get('/:id/download', async (c) => {
     return c.json({ error: 'Password required' }, 403)
   }
 
-  const clip = await db.getClip(share.clip_id)
-  if (!clip || clip.type !== 'file') {
+  const item = await db.getItem(share.item_id)
+  if (!item || item.type !== 'file') {
     return c.json({ error: 'File not found' }, 404)
   }
 
-  const file = await fileStore.get(clip.content!)
+  const file = await fileStore.get(item.content!)
   if (!file) return c.json({ error: 'File data not found' }, 404)
 
   const headers = new Headers()
   headers.set('Content-Type', file.contentType)
-  headers.set('Content-Disposition', `attachment; filename="${encodeURIComponent(clip.filename || 'file')}"`)
+  headers.set('Content-Disposition', `attachment; filename="${encodeURIComponent(item.filename || 'file')}"`)
 
   if (file.data instanceof ArrayBuffer) {
     return new Response(file.data, { headers })

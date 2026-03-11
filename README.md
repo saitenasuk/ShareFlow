@@ -46,7 +46,7 @@ docker compose up -d
 
 # 或手动构建
 docker build -t shareflow .
-docker run -d -p 3000:3000 -v clipboard_data:/data shareflow
+docker run -d -p 3000:3000 -v shareflow_data:/data shareflow
 ```
 
 ---

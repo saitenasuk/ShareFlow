@@ -38,8 +38,8 @@ files.post('/', async (c) => {
   const arrayBuffer = await file.arrayBuffer()
   await fileStore.put(fileKey, arrayBuffer, file.type || 'application/octet-stream')
 
-  // Create clip record
-  const clip = {
+  // Create item record
+  const item = {
     id,
     type: 'file' as const,
     content: fileKey,
@@ -49,8 +49,8 @@ files.post('/', async (c) => {
     created_at: Math.floor(Date.now() / 1000),
   }
 
-  await db.createClip(clip)
-  return c.json(clip, 201)
+  await db.createItem(item)
+  return c.json(item, 201)
 })
 
 // Download file
@@ -58,19 +58,19 @@ files.get('/:id', async (c) => {
   const db = c.get('db')
   const fileStore = c.get('fileStore')
 
-  const clip = await db.getClip(c.req.param('id'))
-  if (!clip || clip.type !== 'file') {
+  const item = await db.getItem(c.req.param('id'))
+  if (!item || item.type !== 'file') {
     return c.json({ error: 'File not found' }, 404)
   }
 
-  const file = await fileStore.get(clip.content!)
+  const file = await fileStore.get(item.content!)
   if (!file) {
     return c.json({ error: 'File data not found' }, 404)
   }
 
   const headers = new Headers()
   headers.set('Content-Type', file.contentType)
-  headers.set('Content-Disposition', `attachment; filename="${encodeURIComponent(clip.filename || 'file')}"`)
+  headers.set('Content-Disposition', `attachment; filename="${encodeURIComponent(item.filename || 'file')}"`)
 
   if (file.data instanceof ArrayBuffer) {
     return new Response(file.data, { headers })
@@ -83,12 +83,12 @@ files.get('/:id/preview', async (c) => {
   const db = c.get('db')
   const fileStore = c.get('fileStore')
 
-  const clip = await db.getClip(c.req.param('id'))
-  if (!clip || clip.type !== 'file') {
+  const item = await db.getItem(c.req.param('id'))
+  if (!item || item.type !== 'file') {
     return c.json({ error: 'File not found' }, 404)
   }
 
-  const file = await fileStore.get(clip.content!)
+  const file = await fileStore.get(item.content!)
   if (!file) {
     return c.json({ error: 'File data not found' }, 404)
   }
@@ -108,18 +108,18 @@ files.delete('/:id', async (c) => {
   const db = c.get('db')
   const fileStore = c.get('fileStore')
 
-  const clip = await db.getClip(c.req.param('id'))
-  if (!clip || clip.type !== 'file') {
+  const item = await db.getItem(c.req.param('id'))
+  if (!item || item.type !== 'file') {
     return c.json({ error: 'File not found' }, 404)
   }
 
   // Delete file from store
-  if (clip.content) {
-    await fileStore.delete(clip.content)
+  if (item.content) {
+    await fileStore.delete(item.content)
   }
 
   // Delete record
-  await db.deleteClip(clip.id)
+  await db.deleteItem(item.id)
   return c.json({ success: true })
 })
 

@@ -1,24 +1,24 @@
 <template>
-  <div class="clip-list">
-    <div class="clip-list-header">
-      <div class="clip-list-title">
+  <div class="item-list">
+    <div class="item-list-header">
+      <div class="item-list-title">
         <h2>📋 记录列表</h2>
-        <span class="clip-list-count" v-if="clips.length">{{ clips.length }} 条</span>
+        <span class="item-list-count" v-if="items.length">{{ items.length }} 条</span>
       </div>
-      <button v-if="clips.length" class="btn btn-ghost-danger btn-sm" @click="handleClearAll">
+      <button v-if="items.length" class="btn btn-ghost-danger btn-sm" @click="handleClearAll">
         清空列表
       </button>
     </div>
 
-    <div v-if="loading" class="clip-list-empty"><span class="spinner"></span> 加载中...</div>
-    <div v-else-if="!clips.length" class="clip-list-empty">还没有内容，发送文本或上传文件开始使用吧</div>
+    <div v-if="loading" class="item-list-empty"><span class="spinner"></span> 加载中...</div>
+    <div v-else-if="!items.length" class="item-list-empty">还没有内容，发送文本或上传文件开始使用吧</div>
 
     <template v-else>
-      <div class="clip-list-items">
-        <ClipCard
-          v-for="clip in clips"
-          :key="clip.id"
-          :clip="clip"
+      <div class="item-list-items">
+        <ItemCard
+          v-for="item in items"
+          :key="item.id"
+          :item="item"
           @delete="handleDelete"
           @preview="(c) => emit('preview', c)"
           @toast="(msg, type) => emit('toast', msg, type)"
@@ -47,27 +47,27 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import ClipCard from './ClipCard.vue'
-import { useApi, type Clip } from '../composables/useApi'
+import ItemCard from './ItemCard.vue'
+import { useApi, type Item } from '../composables/useApi'
 
 const emit = defineEmits<{
   toast: [message: string, type: 'success' | 'error']
-  preview: [clip: Clip]
+  preview: [item: Item]
   shared: []
 }>()
 
-const { fetchClips, deleteClip, clearAll } = useApi()
+const { fetchItems, deleteItem, clearAll } = useApi()
 
-const clips = ref<Clip[]>([])
+const items = ref<Item[]>([])
 const loading = ref(true)
 const showClearAllConfirm = ref(false)
 
 let refreshTimer: ReturnType<typeof setInterval>
 
-async function loadClips() {
+async function loadItems() {
   try {
-    const data = await fetchClips()
-    clips.value = data.items || []
+    const data = await fetchItems()
+    items.value = data.items || []
   } catch {
     // silent
   } finally {
@@ -77,8 +77,8 @@ async function loadClips() {
 
 async function handleDelete(id: string, type: 'text' | 'file') {
   try {
-    await deleteClip(id, type)
-    clips.value = clips.value.filter((c) => c.id !== id)
+    await deleteItem(id, type)
+    items.value = items.value.filter((c) => c.id !== id)
     emit('toast', '✅ 已删除', 'success')
   } catch {
     emit('toast', '❌ 删除失败', 'error')
@@ -93,18 +93,18 @@ async function doClearAll() {
   showClearAllConfirm.value = false
   try {
     const count = await clearAll()
-    clips.value = []
+    items.value = []
     emit('toast', `✅ 已清空 ${count} 条`, 'success')
   } catch {
     emit('toast', '❌ 清空失败', 'error')
   }
 }
 
-defineExpose({ loadClips })
+defineExpose({ loadItems })
 
 onMounted(() => {
-  loadClips()
-  refreshTimer = setInterval(loadClips, 5000)
+  loadItems()
+  refreshTimer = setInterval(loadItems, 5000)
 })
 
 onUnmounted(() => {

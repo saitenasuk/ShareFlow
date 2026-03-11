@@ -28,7 +28,7 @@
     <header class="app-header">
       <h1><img src="/icons/logo.png" alt="ShareFlow" class="logo-img" /> <span class="header-text">ShareFlow</span></h1>
       <div class="header-tabs">
-        <button class="header-tab" :class="{ active: activeTab === 'clips' }" @click="activeTab = 'clips'">
+        <button class="header-tab" :class="{ active: activeTab === 'items' }" @click="activeTab = 'items'">
           📋 <span class="header-text">记录</span>
         </button>
         <button class="header-tab" :class="{ active: activeTab === 'shares' }" @click="activeTab = 'shares'">
@@ -59,9 +59,9 @@
       </aside>
 
       <main class="right-panel" @touchstart="onTouchStart" @touchend="onTouchEnd">
-        <ClipList
-          v-show="activeTab === 'clips'"
-          ref="clipListRef"
+        <ItemList
+          v-show="activeTab === 'items'"
+          ref="itemListRef"
           @toast="showToast"
           @preview="openPreview"
           @shared="handleShared"
@@ -118,36 +118,36 @@
 
       <!-- Preview Modal -->
       <Transition name="confirm-fade">
-        <div v-if="previewClip" class="preview-overlay" @click.self="previewClip = null">
+        <div v-if="previewItem" class="preview-overlay" @click.self="previewItem = null">
           <div class="preview-modal">
             <div class="preview-modal-header">
-              <span>{{ previewClip.type === 'text' ? '📝 文本预览' : '📎 文件预览' }}</span>
+              <span>{{ previewItem.type === 'text' ? '📝 文本预览' : '📎 文件预览' }}</span>
               <div class="preview-modal-header-actions">
-                <button v-if="previewClip.type === 'text'" class="btn-icon" @click="copyPreviewText" :title="previewCopied ? '已复制!' : '复制'">
+                <button v-if="previewItem.type === 'text'" class="btn-icon" @click="copyPreviewText" :title="previewCopied ? '已复制!' : '复制'">
                   {{ previewCopied ? '✅' : '📋' }}
                 </button>
-                <a v-if="previewClip.type === 'file'" :href="getFileUrlForClip(previewClip.id)" class="btn-icon" download title="下载">
+                <a v-if="previewItem.type === 'file'" :href="getFileUrlForItem(previewItem.id)" class="btn-icon" download title="下载">
                   ⬇️
                 </a>
-                <button class="btn-icon" @click="previewClip = null">✕</button>
+                <button class="btn-icon" @click="previewItem = null">✕</button>
               </div>
             </div>
             <div class="preview-modal-body">
-              <template v-if="previewClip.type === 'text'">
-                <pre class="preview-text-raw">{{ previewClip.content }}</pre>
+              <template v-if="previewItem.type === 'text'">
+                <pre class="preview-text-raw">{{ previewItem.content }}</pre>
               </template>
               <template v-else>
                 <img
-                  v-if="previewClip.mimetype?.startsWith('image/')"
-                  :src="getPreviewUrlForClip(previewClip.id)"
-                  :alt="previewClip.filename || ''"
+                  v-if="previewItem.mimetype?.startsWith('image/')"
+                  :src="getPreviewUrlForItem(previewItem.id)"
+                  :alt="previewItem.filename || ''"
                   class="preview-image"
                 />
                 <div v-else class="preview-file-info">
                   <div style="font-size: 3rem; margin-bottom: 12px">📄</div>
-                  <div style="font-weight: 600">{{ previewClip.filename }}</div>
+                  <div style="font-weight: 600">{{ previewItem.filename }}</div>
                   <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px">
-                    {{ previewClip.mimetype }}
+                    {{ previewItem.mimetype }}
                   </div>
                 </div>
               </template>
@@ -174,17 +174,17 @@
 import { ref, onMounted, reactive } from 'vue'
 import TextInput from './components/TextInput.vue'
 import FileUpload from './components/FileUpload.vue'
-import ClipList from './components/ClipList.vue'
+import ItemList from './components/ItemList.vue'
 import SharesList from './components/SharesList.vue'
-import { useApi, type AppConfigData, type Clip } from './composables/useApi'
+import { useApi, type AppConfigData, type Item } from './composables/useApi'
 
-const { fetchConfig, login, checkAuth, createTextClip, uploadFile, getPreviewUrl, getFileUrl } = useApi()
+const { fetchConfig, login, checkAuth, createTextItem, uploadFile, getPreviewUrl, getFileUrl } = useApi()
 
 const textInputRef = ref<InstanceType<typeof TextInput> | null>(null)
 const fileUploadRef = ref<InstanceType<typeof FileUpload> | null>(null)
 const mobileTextRef = ref<InstanceType<typeof TextInput> | null>(null)
 const mobileFileRef = ref<InstanceType<typeof FileUpload> | null>(null)
-const clipListRef = ref<InstanceType<typeof ClipList> | null>(null)
+const itemListRef = ref<InstanceType<typeof ItemList> | null>(null)
 const sharesListRef = ref<InstanceType<typeof SharesList> | null>(null)
 
 const initializing = ref(true)
@@ -195,9 +195,9 @@ const loginError = ref('')
 
 const showMobileSheet = ref(false)
 const mobileTab = ref<'text' | 'file'>('text')
-const previewClip = ref<Clip | null>(null)
+const previewItem = ref<Item | null>(null)
 const previewCopied = ref(false)
-const activeTab = ref<'clips' | 'shares'>('clips')
+const activeTab = ref<'items' | 'shares'>('items')
 
 const config = reactive<AppConfigData>({
   maxFileSize: 10485760,
@@ -216,20 +216,20 @@ function showToast(message: string, type: 'success' | 'error' = 'success') {
   setTimeout(() => { toasts.value.shift() }, 3000)
 }
 
-function openPreview(clip: Clip) {
-  previewClip.value = clip
+function openPreview(item: Item) {
+  previewItem.value = item
 }
 
-function getPreviewUrlForClip(id: string): string {
+function getPreviewUrlForItem(id: string): string {
   return getPreviewUrl(id)
 }
 
-function getFileUrlForClip(id: string): string {
+function getFileUrlForItem(id: string): string {
   return getFileUrl(id)
 }
 
 async function copyPreviewText() {
-  const text = previewClip.value?.content
+  const text = previewItem.value?.content
   if (!text) return
   try {
     await navigator.clipboard.writeText(text)
@@ -265,9 +265,9 @@ async function handleLogin() {
 
 async function handleTextSubmit(content: string) {
   try {
-    await createTextClip(content)
+    await createTextItem(content)
     showToast('✅ 文本已发布')
-    clipListRef.value?.loadClips()
+    itemListRef.value?.loadItems()
   } catch (e: any) {
     showToast(`❌ ${e.message}`, 'error')
   }
@@ -281,7 +281,7 @@ async function doFileUpload(file: File, uploadRef: InstanceType<typeof FileUploa
       uploadRef.setProgress(progress)
     })
     showToast(`✅ 文件 "${file.name}" 已上传`)
-    clipListRef.value?.loadClips()
+    itemListRef.value?.loadItems()
   } catch (e: any) {
     showToast(`❌ ${e.message}`, 'error')
   } finally {
@@ -305,12 +305,11 @@ function onTouchStart(e: TouchEvent) {
 function onTouchEnd(e: TouchEvent) {
   const dx = e.changedTouches[0].clientX - touchStartX
   const dy = e.changedTouches[0].clientY - touchStartY
-  // Only trigger if horizontal swipe is dominant and > 50px
   if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
     if (dx < 0) {
       activeTab.value = 'shares'
     } else {
-      activeTab.value = 'clips'
+      activeTab.value = 'items'
     }
   }
 }

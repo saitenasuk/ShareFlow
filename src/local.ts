@@ -12,7 +12,7 @@ const dataDir = path.resolve(config.DATA_DIR)
 // Ensure data directory exists
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true })
 
-const db = new SqliteDatabase(path.join(dataDir, 'clipboard.db'))
+const db = new SqliteDatabase(path.join(dataDir, 'shareflow.db'))
 const fileStore = new LocalFileStore(path.join(dataDir, 'uploads'))
 
 await db.initialize()
