@@ -70,23 +70,23 @@ docker run -d -p 3000:3000 -v shareflow_data:/data shareflow
 # 1. 登录 Cloudflare
 npx wrangler login
 
-# 2. 创建 D1 数据库
+# 2. 创建 D1 数据库（记录返回的 database_id 填入 wrangler.toml）
 npx wrangler d1 create shareflow-db
 
-# 3. 初始化数据库
-npx wrangler d1 execute shareflow-db --file=./schema.sql
-
-# 4. 创建 R2 存储桶
+# 3. 创建 R2 存储桶
 npx wrangler r2 bucket create shareflow-files
 
-# 5. 设置访问密码(可选)
+# 4. 设置访问密码（可选）
 npx wrangler secret put AUTH_PASSWORD
 
-# 6. 构建前端
+# 5. 构建前端
 npm run build
 
-# 7. 部署
+# 6. 部署
 npm run deploy
+
+# 7. 初始化数据库表结构（首次部署后执行一次）
+npx wrangler d1 execute shareflow-db --remote --file=./schema.sql
 ```
 
 #### 配置说明
@@ -97,6 +97,11 @@ npm run deploy
 [vars]
 MAX_FILE_SIZE = "26214400"      # 25MB
 MAX_TEXT_LENGTH = "100000"      # 100k chars
+
+[[d1_databases]]
+binding = "DB"
+database_name = "shareflow-db"
+database_id = "your-database-id"
 
 [[r2_buckets]]
 bucket_name = "shareflow-files"

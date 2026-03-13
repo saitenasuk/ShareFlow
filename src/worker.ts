@@ -1,3 +1,4 @@
+/// <reference types="@cloudflare/workers-types" />
 import { createApp } from './app.js'
 import { D1Database as D1Adapter, R2FileStore } from './storage/cloudflare.js'
 import { getConfig } from './config.js'
@@ -10,6 +11,7 @@ interface Env {
   AUTH_PASSWORD?: string
 }
 
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const config = getConfig({
@@ -20,9 +22,6 @@ export default {
 
     const db = new D1Adapter(env.DB as any)
     const fileStore = new R2FileStore(env.BUCKET)
-
-    // Initialize DB on first request (creates table if not exists)
-    await db.initialize()
 
     const app = createApp(db, fileStore, config)
     return app.fetch(request, env, ctx)

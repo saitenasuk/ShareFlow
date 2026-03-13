@@ -11,6 +11,7 @@ MAX_TEXT_LENGTH = "100000"
 [[d1_databases]]
 binding = "DB"
 database_name = "shareflow-db"
+database_id = "your-database-id"
 
 [[r2_buckets]]
 binding = "BUCKET"
