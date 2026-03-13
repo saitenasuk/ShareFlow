@@ -4,13 +4,12 @@ compatibility_date = "2024-09-01"
 assets = { directory = "dist" }
 
 [vars]
-MAX_FILE_SIZE = "10485760"
+MAX_FILE_SIZE = "26214400"      # 25MB
 MAX_TEXT_LENGTH = "100000"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "shareflow-db"
-database_id = "YOUR_D1_DATABASE_ID"
 
 [[r2_buckets]]
 binding = "BUCKET"
