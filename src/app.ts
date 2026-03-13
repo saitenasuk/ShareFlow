@@ -6,7 +6,7 @@ import { files } from './routes/files.js'
 import { shares } from './routes/shares.js'
 import type { IDatabase, IFileStore } from './storage/interface.js'
 import type { AppConfig } from './config.js'
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
 export type AppEnv = {
   Variables: {
