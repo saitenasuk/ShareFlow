@@ -171,7 +171,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, watch } from 'vue'
 import TextInput from './components/TextInput.vue'
 import FileUpload from './components/FileUpload.vue'
 import ItemList from './components/ItemList.vue'
@@ -315,8 +315,18 @@ function onTouchEnd(e: TouchEvent) {
 }
 
 function handleShared() {
-  // Don't auto-switch — user stays on current tab
+  // Refresh shares list in background so it's ready if user switches
+  sharesListRef.value?.loadShares()
 }
+
+// Immediately refresh the target list when switching tabs
+watch(activeTab, (tab) => {
+  if (tab === 'items') {
+    itemListRef.value?.loadItems()
+  } else {
+    sharesListRef.value?.loadShares()
+  }
+})
 
 async function handleMobileTextSubmit(content: string) {
   await handleTextSubmit(content)
