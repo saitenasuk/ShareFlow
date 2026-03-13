@@ -10,9 +10,6 @@ interface Env {
   AUTH_PASSWORD?: string
 }
 
-// Cache initialization per Worker instance (reused across requests in same instance)
-let initPromise: Promise<void> | null = null
-
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const config = getConfig({
@@ -24,11 +21,8 @@ export default {
     const db = new D1Adapter(env.DB as any)
     const fileStore = new R2FileStore(env.BUCKET)
 
-    // Initialize DB only once per Worker instance
-    if (!initPromise) {
-      initPromise = db.initialize()
-    }
-    await initPromise
+    // Initialize DB on first request (creates table if not exists)
+    await db.initialize()
 
     const app = createApp(db, fileStore, config)
     return app.fetch(request, env, ctx)
